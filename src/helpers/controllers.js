@@ -32,6 +32,9 @@ export class ModelController {
 
   async create(data) {
     try {
+
+
+
       const obj = await this.Model.create(data);
       return defaultReponse(obj.toJSON());
     } catch(e) {

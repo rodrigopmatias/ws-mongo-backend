@@ -5,6 +5,10 @@ module.exports = {
   },
   extends: 'airbnb-base',
   globals: {
+    describe: true,
+    it: true,
+    request: true,
+    expect: true,
     Atomics: 'readonly',
     SharedArrayBuffer: 'readonly',
   },
@@ -13,5 +17,6 @@ module.exports = {
     sourceType: 'module',
   },
   rules: {
+    "no-param-reassign": "off"
   },
 };

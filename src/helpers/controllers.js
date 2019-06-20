@@ -3,38 +3,38 @@ import { OK, BAD_REQUEST, CREATED } from 'http-status-codes';
 const defaultReponse = (data, status = OK) => ({
   result: {
     ok: true,
-    ...data
+    ...data,
   },
-  status: status
+  status,
 });
 
 const errorResponse = (message, status = BAD_REQUEST) => ({
   result: {
     ok: false,
-    message
+    message,
   },
   status,
 });
 
 export class ModelController {
   constructor(Model, name) {
-    this._name = name;
-    this._Model = Model;
+    this.$name = name;
+    this.$Model = Model;
   }
 
   get controllerName() {
-    return this._name;
+    return this.$name;
   }
 
   get Model() {
-    return this._Model;
+    return this.$Model;
   }
 
   async create(data) {
     try {
       const obj = await this.Model.create(data);
       return defaultReponse(obj.toJSON(), CREATED);
-    } catch(e) {
+    } catch (e) {
       return errorResponse(e.toString());
     }
   }
@@ -50,9 +50,13 @@ export class ModelController {
 }
 
 export const factoryController = (Model, name, ControllerBase) => {
+  let obj;
+
   if (ControllerBase) {
-    return new ControllerBase(Model, name);
+    obj = new ControllerBase(Model, name);
   } else {
-    return new ModelController(Model, name);
+    obj = new ModelController(Model, name);
   }
-}
+
+  return obj;
+};

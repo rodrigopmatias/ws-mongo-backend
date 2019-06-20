@@ -13,7 +13,7 @@ const app = express();
 app.use(morgan('dev'));
 app.use(bodyParser.json());
 
-[ conf, models, controllers, routes ].forEach(inject => inject(app));
+[conf, models, controllers, routes].forEach(inject => inject(app));
 
 app.get('/debug', (req, res) => res.status(200).send({ ok: true }));
 

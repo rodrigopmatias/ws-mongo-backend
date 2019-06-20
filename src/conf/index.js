@@ -1,11 +1,12 @@
+/* eslint-disable no-param-reassign */
 import server from './server';
-import ssl from './ssl';
+import tls from './tls';
 import mongoose from './mongoose';
 
-export default app => {
+export default (app) => {
   app.conf = {
-    ssl,
+    tls,
     server,
     mongoose,
   };
-}
+};

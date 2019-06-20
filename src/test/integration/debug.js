@@ -6,6 +6,6 @@ describe('Action of debug', () => {
       .end((err, res) => {
         expect(res.body.ok).to.be.eql(true);
         done(err);
-      })
-  })
+      });
+  });
 });

@@ -2,7 +2,7 @@ import { factoryController, ModelController } from '../helpers/controllers';
 
 class UserController extends ModelController {
   constructor(Model) {
-    super(Model,  'UserController');
+    super(Model, 'UserController');
   }
 }
 

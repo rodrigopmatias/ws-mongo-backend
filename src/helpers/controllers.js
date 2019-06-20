@@ -1,15 +1,15 @@
-import { OK, BAD_REQUEST } from 'http-status-codes';
+import { OK, BAD_REQUEST, CREATED } from 'http-status-codes';
 
 const defaultReponse = (data, status = OK) => ({
-  json: {
+  result: {
     ok: true,
-    data
+    ...data
   },
   status: status
 });
 
 const errorResponse = (message, status = BAD_REQUEST) => ({
-  json: {
+  result: {
     ok: false,
     message
   },
@@ -32,12 +32,18 @@ export class ModelController {
 
   async create(data) {
     try {
-
-
-
       const obj = await this.Model.create(data);
-      return defaultReponse(obj.toJSON());
+      return defaultReponse(obj.toJSON(), CREATED);
     } catch(e) {
+      return errorResponse(e.toString());
+    }
+  }
+
+  async get(id) {
+    try {
+      const obj = await this.Model.findById(id);
+      return defaultReponse(obj.toJSON(), OK);
+    } catch (e) {
       return errorResponse(e.toString());
     }
   }

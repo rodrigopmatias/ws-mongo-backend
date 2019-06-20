@@ -1,13 +1,11 @@
 import server from './server';
+import ssl from './ssl';
 import mongoose from './mongoose';
 
-let conf = {};
-
 export default app => {
-  conf = {
+  app.conf = {
+    ssl,
     server,
     mongoose,
-  }
-
-  app.conf = conf;
+  };
 }

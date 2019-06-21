@@ -1,5 +1,5 @@
 --require babel-core/register
---require src/test/integration/helpers.js
+--require src/test/unit/helpers.js
 --reporter spec
 --slow 500
 --exit

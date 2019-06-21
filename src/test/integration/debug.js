@@ -1,6 +1,6 @@
 
 describe('Action of debug', () => {
-  it('Should retunr ok (200)', (done) => {
+  it('Should return ok (200)', (done) => {
     request.get('/debug')
       .expect(200)
       .end((err, res) => {

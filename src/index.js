@@ -5,8 +5,8 @@ import app from './app';
 
 const { addr, port } = app.conf.server;
 const {
-  ssl, sslCert, sslKey, sslPort,
-} = app.conf.ssl;
+  tls, tlsCert, tlsKey, tlsPort,
+} = app.conf.tls;
 
 http.createServer(app).listen(
   port,
@@ -14,16 +14,16 @@ http.createServer(app).listen(
   () => console.log(`Server is ready you can access http://${addr}:${port}/`),
 );
 
-if (ssl) {
+if (tls) {
   const options = {
-    cert: sslCert,
-    key: sslKey,
+    cert: tlsCert,
+    key: tlsKey,
   };
 
   https.createServer(options, app)
     .listen(
-      sslPort,
+      tlsPort,
       addr,
-      () => console.log(`Server is ready you can access https://${addr}:${sslPort}/`),
+      () => console.log(`Server is ready you can access https://${addr}:${tlsPort}/`),
     );
 }

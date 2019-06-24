@@ -1,17 +1,17 @@
 import { OK, BAD_REQUEST, CREATED } from 'http-status-codes';
 
-export const defaultReponse = (data, ok = true, status = OK) => ({
+export const defaultReponse = (data, status = OK, ok = true) => ({
   result: {
-    ok,
     ...data,
+    ok,
   },
   status,
 });
 
 export const errorResponse = (message, status = BAD_REQUEST) => defaultReponse(
   { message },
-  false,
   status,
+  false,
 );
 
 export class ModelController {
@@ -32,8 +32,8 @@ export class ModelController {
     let result;
 
     try {
-      const obj = await this.Model.create(data);
-      result = defaultReponse(obj.toJSON(), CREATED);
+      const instance = await this.Model.create(data);
+      result = defaultReponse({ instance }, CREATED);
     } catch (e) {
       result = errorResponse(e.toString());
     }

@@ -5,8 +5,12 @@ module.exports = {
   },
   extends: 'airbnb-base',
   globals: {
+    app: true,
+    td: true,
     describe: true,
     it: true,
+    before: true,
+    after: true,
     request: true,
     expect: true,
     Atomics: 'readonly',

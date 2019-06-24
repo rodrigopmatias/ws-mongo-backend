@@ -1,4 +1,10 @@
-import { OK, BAD_REQUEST, CREATED } from 'http-status-codes';
+import {
+  OK,
+  BAD_REQUEST,
+  CREATED,
+  NOT_FOUND,
+  NO_CONTENT,
+} from 'http-status-codes';
 
 export const defaultReponse = (data, status = OK, ok = true) => ({
   result: {
@@ -26,6 +32,53 @@ export class ModelController {
 
   get Model() {
     return this.$Model;
+  }
+
+  async findById(_id) {
+    let result;
+
+    try {
+      const res = await this.Model.findById(_id);
+      if (res) {
+        result = defaultReponse({ instance: res }, OK);
+      } else {
+        result = errorResponse('not found', NOT_FOUND);
+      }
+    } catch (e) {
+      result = errorResponse(e.toString());
+    }
+
+    return result;
+  }
+
+  async update(_id, data) {
+    let result;
+
+    try {
+      const res = await this.Model.updateOne({ _id }, data);
+      if (res.nModified > 0) {
+        result = defaultReponse({ updated: res.nModified }, OK);
+      } else {
+        result = errorResponse('item not found', NOT_FOUND);
+      }
+    } catch (e) {
+      result = errorResponse(e.toString());
+    }
+
+    return result;
+  }
+
+  async destroy(_id) {
+    let result;
+
+    try {
+      await this.Model.deleteOne({ _id });
+      result = defaultReponse(null, NO_CONTENT);
+    } catch (e) {
+      result = errorResponse(e.toString(), NOT_FOUND);
+    }
+
+    return result;
   }
 
   async create(data) {

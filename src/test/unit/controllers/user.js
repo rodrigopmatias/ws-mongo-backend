@@ -1,4 +1,10 @@
-import { CREATED, BAD_REQUEST, OK, NOT_FOUND, NO_CONTENT } from 'http-status-codes';
+import {
+  OK,
+  BAD_REQUEST,
+  CREATED,
+  NOT_FOUND,
+  NO_CONTENT,
+} from 'http-status-codes';
 
 describe('Unit: UserController', () => {
   const { UserController } = app.controllers;
@@ -53,7 +59,7 @@ describe('Unit: UserController', () => {
       const myId = 'myId';
 
       UserController.$Model = td.object();
-      td.when(UserController.$Model.updateOne(myId, newData)).thenResolve({
+      td.when(UserController.$Model.updateOne({ _id: myId }, newData)).thenResolve({
         n: 1,
         nModified: 1,
       });
@@ -62,7 +68,7 @@ describe('Unit: UserController', () => {
         .then((res) => {
           expect(res.status).to.be.eql(OK);
           expect(res.result.ok).to.be.eql(true);
-          expect(res.result.count).to.be.eql(1);
+          expect(res.result.updated).to.be.eql(1);
           done();
         })
         .catch(err => done(err));
@@ -72,7 +78,7 @@ describe('Unit: UserController', () => {
       const myId = 'myId';
 
       UserController.$Model = td.object();
-      td.when(UserController.$Model.updateOne(myId, newData)).thenResolve({
+      td.when(UserController.$Model.updateOne({ _id: myId }, newData)).thenResolve({
         n: 0,
         nModified: 0,
       });
@@ -109,7 +115,8 @@ describe('Unit: UserController', () => {
       const myId = 'myId';
 
       UserController.$Model = td.object();
-      td.when(UserController.$Model.deleteOne(myId)).thenResolve();
+      td.when(UserController.$Model.deleteOne({ _id: myId }))
+        .thenResolve();
 
       UserController.destroy(myId)
         .then((res) => {
@@ -124,7 +131,8 @@ describe('Unit: UserController', () => {
       const myId = 'myId';
 
       UserController.$Model = td.object();
-      td.when(UserController.$Model.deleteOne(myId)).thenReject('any message');
+      td.when(UserController.$Model.deleteOne({ _id: myId }))
+        .thenReject('any message');
 
       UserController.destroy(myId)
         .then((res) => {
@@ -163,7 +171,8 @@ describe('Unit: UserController', () => {
 
     it('Should user not found', (done) => {
       UserController.$Model = td.object();
-      td.when(UserController.$Model.findById('any id')).thenReject('any message');
+      td.when(UserController.$Model.findById('any id'))
+        .thenResolve();
 
       UserController.findById('any id')
         .then((res) => {

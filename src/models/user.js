@@ -25,21 +25,40 @@ export default (app) => {
   });
 
   /* eslint func-names: off */
-  UserSchema.methods.matchPassword = function () {
+  UserSchema.methods.matchPassword = function (plain) {
+    return new Promise(
+      (resolve, reject) => {
+        const { secret, hashPassword } = security;
 
-  }
+        crypto.pbkdf2(plain, secret, 10000, 128, hashPassword, (err, derivedKey) => {
+          if (err) {
+            this.password = null;
+            reject(err);
+          } else {
+            resolve(this.password === derivedKey.toString('base64'));
+          }
+        });
+      },
+    );
+  };
 
   /* eslint func-names: off */
   UserSchema.methods.setPassword = function (plain) {
-    const { secret } = security;
+    return new Promise(
+      (resolve, reject) => {
+        const { secret, hashPassword } = security;
 
-    crypto.pbkdf2(plain, secret, 10000, 128, 'sha224WithRSAEncryption', (err, derivedKey) => {
-      if (err) {
-        this.password = null;
-      } else {
-        this.password = derivedKey;
-      }
-    });
+        crypto.pbkdf2(plain, secret, 10000, 128, hashPassword, (err, derivedKey) => {
+          if (err) {
+            this.password = null;
+            reject(err);
+          } else {
+            this.password = derivedKey.toString('base64');
+            resolve(false);
+          }
+        });
+      },
+    );
   };
 
   return mongoose.model('User', UserSchema);

@@ -1,9 +1,15 @@
-import { BAD_REQUEST, CREATED, NOT_FOUND } from 'http-status-codes';
+import {
+  OK,
+  BAD_REQUEST,
+  CREATED,
+  NOT_FOUND,
+} from 'http-status-codes';
 import { errorResponse, defaultReponse } from '../helpers/controllers';
 
 export class AuthController {
-  constructor(Model) {
+  constructor(Model, Activation) {
     this.$Model = Model;
+    this.$Activation = Activation;
     this.$controllerName = 'AuthController';
   }
 
@@ -13,6 +19,28 @@ export class AuthController {
 
   get Model() {
     return this.$Model;
+  }
+
+  async activate(token) {
+    const found = (await this.$Activation.countDocuments({ token }) === 1);
+    let obj;
+
+    if (!found) {
+      obj = errorResponse('activation token not found', NOT_FOUND);
+    } else {
+      const act = await this.$Activation.findOne({ token });
+
+      if (act.usedAt) {
+        obj = errorResponse('activation token already used', BAD_REQUEST);
+      } else if (act.expiredAt >= new Date()) {
+        obj = errorResponse('activation token already expired', BAD_REQUEST);
+      } else {
+        await this.$Model.updateOne({ _id: act.userId }, { isActive: true });
+        obj = defaultReponse({}, OK);
+      }
+    }
+
+    return obj;
   }
 
   async register(data) {
@@ -68,4 +96,4 @@ export class AuthController {
   }
 }
 
-export default app => new AuthController(app.models.User);
+export default app => new AuthController(app.models.User, app.models.Activation);

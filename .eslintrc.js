@@ -21,6 +21,8 @@ module.exports = {
     sourceType: 'module',
   },
   rules: {
-    "no-param-reassign": "off"
+    "no-param-reassign": "off",
+    "no-underscore-dangle": "off",
+    "func-names": "off",
   },
 };

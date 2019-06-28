@@ -1,4 +1,9 @@
-import { BAD_REQUEST, CREATED, NOT_FOUND } from 'http-status-codes';
+import {
+  OK,
+  BAD_REQUEST,
+  CREATED,
+  NOT_FOUND,
+} from 'http-status-codes';
 
 describe('Unit: AuthController', () => {
   describe('Register user: register', () => {
@@ -180,15 +185,89 @@ describe('Unit: AuthController', () => {
 
   describe('Activate user: activate', () => {
     it('Should activation token not found', (done) => {
-      done();
+      const { AuthController } = app.controllers;
+      const ActivationMock = td.object();
+      const token = 'not-found-token';
+
+      td.when(ActivationMock.countDocuments({ token })).thenResolve(0);
+
+      AuthController.$Activation = ActivationMock;
+      AuthController.activate(token)
+        .then((obj) => {
+          expect(obj.status).to.be.eql(NOT_FOUND);
+          expect(obj.result.ok).to.be.eql(false);
+          done();
+        })
+        .catch(err => done(err));
     });
 
     it('Should activation token already used', (done) => {
-      done();
+      const { AuthController } = app.controllers;
+      const ActivationMock = td.object();
+      const token = 'used-token';
+
+      td.when(ActivationMock.countDocuments({ token })).thenResolve(1);
+      td.when(ActivationMock.findOne({ token })).thenResolve({
+        usedAt: new Date(),
+      });
+
+      AuthController.$Activation = ActivationMock;
+      AuthController.activate(token)
+        .then((obj) => {
+          expect(obj.status).to.be.eql(BAD_REQUEST);
+          expect(obj.result.ok).to.be.eql(false);
+          done();
+        })
+        .catch(err => done(err));
+    });
+
+    it('Should activation token already expired', (done) => {
+      const { AuthController } = app.controllers;
+      const ActivationMock = td.object();
+      const token = 'expired-token';
+
+      td.when(ActivationMock.countDocuments({ token })).thenResolve(1);
+      td.when(ActivationMock.findOne({ token })).thenResolve({
+        usedAt: null,
+        expiredAt: new Date(),
+      });
+
+      AuthController.$Activation = ActivationMock;
+      AuthController.activate(token)
+        .then((obj) => {
+          expect(obj.status).to.be.eql(BAD_REQUEST);
+          expect(obj.result.ok).to.be.eql(false);
+          done();
+        })
+        .catch(err => done(err));
     });
 
     it('Should user activated with sucess', (done) => {
-      done();
+      const { AuthController } = app.controllers;
+      const ActivationMock = td.object();
+      const UserMock = td.object();
+      const token = 'valid-token';
+
+      td.when(ActivationMock.countDocuments({ token })).thenResolve(1);
+      td.when(ActivationMock.findOne({ token })).thenResolve({
+        userId: 'user-id',
+        usedAt: null,
+        expiredAt: null,
+      });
+      td.when(UserMock.updateOne({ _id: 'user-id', isActive: true })).thenResolve({
+        n: 1,
+        nModified: 1,
+      });
+
+      AuthController.$Model = UserMock;
+      AuthController.$Activation = ActivationMock;
+      AuthController.activate(token)
+        .then((obj) => {
+          expect(obj.status).to.be.eql(OK);
+          expect(obj.result.ok).to.be.eql(true);
+          done();
+        })
+        .catch(err => done(err));
     });
   });
 

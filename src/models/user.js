@@ -24,6 +24,15 @@ export default (app) => {
     },
   });
 
+  UserSchema.methods.requestActivation = function () {
+    const { Activation } = mongoose.models;
+
+    return Activation.create({
+      userId: this._id,
+      expireAt: new Date(),
+    });
+  };
+
   /* eslint func-names: off */
   UserSchema.methods.matchPassword = function (plain) {
     return new Promise(

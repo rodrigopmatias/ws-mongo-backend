@@ -7,7 +7,7 @@ const opts = {
   useFindAndModify: false,
 };
 
-if (process.env.NODE_ENT === 'test') {
+if (process.env.NODE_ENV === 'test') {
   uri = process.env.MONGO_URI_TEST || 'mongodb://localhost/db_test';
 } else {
   uri = process.env.MONGO_URI || 'mongodb://localhost/db';

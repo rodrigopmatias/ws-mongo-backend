@@ -1,4 +1,5 @@
 import jwt from 'jwt-simple';
+import { UNAUTHORIZED } from 'http-status-codes';
 
 export default (app) => {
   const { secret } = app.conf.security;
@@ -27,4 +28,15 @@ export default (app) => {
 
     next();
   });
+};
+
+export const authRequired = (req, res, next) => {
+  if (!req.user) {
+    res.status(UNAUTHORIZED).send({
+      ok: false,
+      message: 'authorizations is required for access this action',
+    });
+  } else {
+    next();
+  }
 };

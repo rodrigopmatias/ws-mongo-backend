@@ -3,6 +3,7 @@ import {
   BAD_REQUEST,
   CREATED,
   NOT_FOUND,
+  UNAUTHORIZED,
 } from 'http-status-codes';
 
 describe('Unit: AuthController', () => {
@@ -272,26 +273,86 @@ describe('Unit: AuthController', () => {
   });
 
   describe('Request authentication token: authenticate', () => {
-    it('Should user or password not match', (done) => {
-      done();
+    it('Should user or password not match (user not found)', (done) => {
+      const { AuthController } = app.controllers;
+      const email = 'badpasswd@test.com';
+      const password = 'badpassword';
+      const UserMock = td.object();
+
+      td.when(UserMock.findOne({ email })).thenResolve(null);
+
+      AuthController.$Model = UserMock;
+      AuthController.authenticate(email, password)
+        .then((res) => {
+          expect(res.status).to.be.eql(UNAUTHORIZED);
+          done();
+        })
+        .catch(err => done(err));
+    });
+
+    it('Should user or password not match (bad password)', (done) => {
+      const { AuthController } = app.controllers;
+      const email = 'badpasswd@test.com';
+      const password = 'badpassword';
+      const UserModelMock = td.object();
+      const UserObjectMock = {
+        isActive: true,
+        matchPassword: td.func(),
+      };
+
+      td.when(UserObjectMock.matchPassword(password)).thenResolve(false);
+      td.when(UserModelMock.findOne({ email })).thenResolve(UserObjectMock);
+
+      AuthController.$Model = UserModelMock;
+      AuthController.authenticate(email, password)
+        .then((res) => {
+          expect(res.status).to.be.eql(UNAUTHORIZED);
+          done();
+        })
+        .catch(err => done(err));
     });
 
     it('Should user is not activated', (done) => {
-      done();
+      const { AuthController } = app.controllers;
+      const email = 'badpasswd@test.com';
+      const password = 'badpassword';
+      const UserMock = td.object();
+      const UserObject = {
+        isActive: false,
+      };
+
+      td.when(UserMock.findOne({ email })).thenResolve(UserObject);
+
+      AuthController.$Model = UserMock;
+      AuthController.authenticate(email, password)
+        .then((res) => {
+          expect(res.status).to.be.eql(UNAUTHORIZED);
+          done();
+        })
+        .catch(err => done(err));
     });
 
     it('Should user token authentication', (done) => {
-      done();
-    });
-  });
+      const { AuthController } = app.controllers;
+      const email = 'user@test.com';
+      const password = 'secret';
+      const UserModelMock = td.object();
+      const UserObjectMock = {
+        isActive: true,
+        matchPassword: td.func(),
+      };
 
-  describe('Get user information from token: status', () => {
-    it('Should user not authenticated', (done) => {
-      done();
-    });
+      td.when(UserObjectMock.matchPassword(password)).thenResolve(true);
+      td.when(UserModelMock.findOne({ email })).thenResolve(UserObjectMock);
 
-    it('Should user informations', (done) => {
-      done();
+      AuthController.$Model = UserModelMock;
+      AuthController.authenticate(email, password)
+        .then((res) => {
+          expect(res.status).to.be.eql(OK);
+          expect(res.result).to.have.property('token');
+          done();
+        })
+        .catch(err => done(err));
     });
   });
 });

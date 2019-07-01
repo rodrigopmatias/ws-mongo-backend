@@ -1,6 +1,13 @@
 export default (app) => {
   const { AuthController } = app.controllers;
 
+  app.route('/auth/authenticate')
+    .post(async (req, res) => {
+      const { email, password } = req.body;
+      const obj = await AuthController.authenticate(email, password);
+      res.status(obj.status).send(obj.result);
+    });
+
   app.route('/auth/activate')
     .get(async (req, res) => {
       const { token } = req.query;

@@ -3,6 +3,7 @@ import {
   CREATED,
   BAD_REQUEST,
   NOT_FOUND,
+  UNAUTHORIZED,
 } from 'http-status-codes';
 
 describe('Router: /auth', () => {
@@ -177,7 +178,6 @@ describe('Router: /auth', () => {
         .then(() => done())
         .catch(err => done(err));
     });
-
     after((done) => {
       User.deleteMany({})
         .then(() => Activation.deleteMany({}))
@@ -208,6 +208,96 @@ describe('Router: /auth', () => {
         .expect(OK)
         .end((err, res) => {
           expect(res.body.ok).to.be.eql(true);
+          done(err);
+        });
+    });
+  });
+
+  describe('User authentication: /auth/authenticate', () => {
+    const { User } = app.models;
+    const password = 'secr3t';
+    const badUser = {
+      email: 'baduser@mail.com',
+      firstName: 'Bad',
+      lastName: 'User',
+      isActive: false,
+      isAdmin: false,
+    };
+    const goodUser = {
+      email: 'gooduser@mail.com',
+      firstName: 'Good',
+      lastName: 'User',
+      isActive: true,
+      isAdmin: false,
+    };
+
+    before((done) => {
+      User.deleteMany({})
+        .then(() => User.create(goodUser))
+        .then((user) => {
+          user.setPassword(password)
+            .then(() => user.save());
+        })
+        .then(() => User.create(badUser))
+        .then((user) => {
+          user.setPassword(password)
+            .then(() => user.save());
+        })
+        .then(() => done())
+        .catch(err => done(err));
+    });
+
+    after((done) => {
+      User.deleteMany({})
+        .then(() => done())
+        .catch(err => done(err));
+    });
+
+    it('Should user or password not match (user not found)', (done) => {
+      request.post('/auth/authenticate')
+        .send({
+          email: 'notfound@mail.com',
+          password: 'anypassword',
+        })
+        .end((err, res) => {
+          expect(res.status).to.be.eql(UNAUTHORIZED);
+          done(err);
+        });
+    });
+
+    it('Should user or password not match (bad password)', (done) => {
+      request.post('/auth/authenticate')
+        .send({
+          email: goodUser.email,
+          password: 'badpassword',
+        })
+        .end((err, res) => {
+          expect(res.status).to.be.eql(UNAUTHORIZED);
+          done(err);
+        });
+    });
+
+    it('Should user is not activated', (done) => {
+      request.post('/auth/authenticate')
+        .send({
+          email: badUser.email,
+          password,
+        })
+        .end((err, res) => {
+          expect(res.status).to.be.eql(UNAUTHORIZED);
+          done(err);
+        });
+    });
+
+    it('Should user token authentication', (done) => {
+      request.post('/auth/authenticate')
+        .send({
+          email: goodUser.email,
+          password,
+        })
+        .end((err, res) => {
+          expect(res.status).to.be.eql(OK);
+          expect(res.body).to.have.property('token');
           done(err);
         });
     });

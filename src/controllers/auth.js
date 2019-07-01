@@ -1,16 +1,19 @@
+import jwt from 'jwt-simple';
 import {
   OK,
   BAD_REQUEST,
   CREATED,
   NOT_FOUND,
+  UNAUTHORIZED,
 } from 'http-status-codes';
 import { errorResponse, defaultReponse } from '../helpers/controllers';
 
 export class AuthController {
-  constructor(Model, Activation) {
+  constructor(Model, Activation, secConf) {
     this.$Model = Model;
     this.$Activation = Activation;
     this.$controllerName = 'AuthController';
+    this.secConf = secConf;
   }
 
   get controllerName() {
@@ -94,6 +97,27 @@ export class AuthController {
 
     return res;
   }
+
+  async authenticate(email, password) {
+    const user = await this.$Model.findOne({ email });
+    let res;
+
+    if (user) {
+      if (!user.isActive) {
+        res = errorResponse('user is inactive', UNAUTHORIZED);
+      } else if (!await user.matchPassword(password)) {
+        res = errorResponse('user or password no match', UNAUTHORIZED);
+      } else {
+        res = defaultReponse({
+          token: jwt.encode({ userId: user._id }, this.secConf.secret),
+        }, OK);
+      }
+    } else {
+      res = errorResponse('user or password no match', UNAUTHORIZED);
+    }
+
+    return res;
+  }
 }
 
-export default app => new AuthController(app.models.User, app.models.Activation);
+export default app => new AuthController(app.models.User, app.models.Activation, app.conf.security);

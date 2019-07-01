@@ -11,17 +11,25 @@ export default (app) => {
     },
     token: String,
     usedAt: Date,
-    expireAt: {
-      type: Date,
-      required: true,
-    },
+    expireAt: { type: Date },
   });
 
   ActivationSchema.pre('save', function (next) {
+    if (!this.expireAt) {
+      this.expireAt = new Date((new Date()).getTime() + (30 * 60 * 1000));
+    }
+
+    next();
+  });
+
+  ActivationSchema.pre('save', function (next) {
+    const { security } = app.conf;
     if (!this.token) {
       crypto.randomBytes(256, (err, derivate) => {
-        this.token = derivate.toString('hex');
-        next();
+        crypto.pbkdf2(derivate, security.secret, 1000, 512, security.hashPassword, (_err, dkey) => {
+          this.token = dkey.toString('hex');
+          next();
+        });
       });
     } else {
       next();

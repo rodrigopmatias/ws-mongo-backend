@@ -32,7 +32,7 @@ export class AuthController {
 
       if (act.usedAt) {
         obj = errorResponse('activation token already used', BAD_REQUEST);
-      } else if (act.expiredAt >= new Date()) {
+      } else if (act.expireAt < new Date()) {
         obj = errorResponse('activation token already expired', BAD_REQUEST);
       } else {
         await this.$Model.updateOne({ _id: act.userId }, { isActive: true });

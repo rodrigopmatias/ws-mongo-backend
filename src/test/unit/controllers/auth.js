@@ -229,7 +229,7 @@ describe('Unit: AuthController', () => {
       td.when(ActivationMock.countDocuments({ token })).thenResolve(1);
       td.when(ActivationMock.findOne({ token })).thenResolve({
         usedAt: null,
-        expiredAt: new Date(),
+        expireAt: new Date(0),
       });
 
       AuthController.$Activation = ActivationMock;

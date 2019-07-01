@@ -26,11 +26,7 @@ export default (app) => {
 
   UserSchema.methods.requestActivation = function () {
     const { Activation } = mongoose.models;
-
-    return Activation.create({
-      userId: this._id,
-      expireAt: new Date(),
-    });
+    return Activation.create({ userId: this._id });
   };
 
   /* eslint func-names: off */

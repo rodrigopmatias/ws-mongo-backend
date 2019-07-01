@@ -165,7 +165,7 @@ describe('Router: /auth', () => {
         })
         .then(() => user.requestActivation())
         .then((act) => {
-          act.expiredAt = new Date();
+          act.expireAt = new Date(0);
           tokenExpired = act.token;
           return act.save();
         })

@@ -13,7 +13,10 @@ export default (app) => {
     },
     firstName: String,
     lastName: String,
-    password: String,
+    password: {
+      type: String,
+      select: false,
+    },
     isActive: {
       type: Boolean,
       default: false,

@@ -51,6 +51,7 @@ describe('Router: /auth', () => {
         .end((err, res) => {
           expect(res.body.ok).to.be.eql(true);
           expect(res.body).to.have.property('user');
+          expect(res.body.user).not.have.property('password');
           expect(res.body.user.isActive).to.be.eql(true);
           expect(res.body.user.isAdmin).to.be.eql(true);
           done(err);
@@ -373,6 +374,7 @@ describe('Router: /auth', () => {
         .end((err, res) => {
           expect(res.status).to.be.eql(OK);
           expect(res.body).to.have.property('user');
+          expect(res.body.user).not.have.property('password');
           done(err);
         });
     });

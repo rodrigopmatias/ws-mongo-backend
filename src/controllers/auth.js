@@ -65,7 +65,7 @@ export class AuthController {
     } else if (!passwordMatch) {
       res = errorResponse('password and confirm password not match.', BAD_REQUEST);
     } else {
-      const user = await this.Model.create({
+      let user = await this.Model.create({
         email,
         firstName,
         lastName,
@@ -75,6 +75,8 @@ export class AuthController {
 
       await user.setPassword(password);
       await user.save();
+
+      user = await this.Model.findOne({ _id: user._id });
 
       res = defaultReponse({ user }, CREATED);
     }
@@ -99,7 +101,7 @@ export class AuthController {
   }
 
   async authenticate(email, password) {
-    const user = await this.$Model.findOne({ email });
+    const user = await this.$Model.findOne({ email }).select(['password', 'isActive']);
     let res;
 
     if (user) {

@@ -1,5 +1,19 @@
+import { OK, UNAUTHORIZED } from 'http-status-codes';
+
 export default (app) => {
   const { AuthController } = app.controllers;
+
+  app.route('/auth/status')
+    .get((req, res) => {
+      if (req.user) {
+        res.status(OK).send({
+          ok: true,
+          user: req.user,
+        });
+      } else {
+        res.sendStatus(UNAUTHORIZED);
+      }
+    });
 
   app.route('/auth/authenticate')
     .post(async (req, res) => {

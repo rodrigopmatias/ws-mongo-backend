@@ -1,3 +1,4 @@
+import jwt from 'jwt-simple';
 import {
   OK,
   CREATED,
@@ -298,6 +299,80 @@ describe('Router: /auth', () => {
         .end((err, res) => {
           expect(res.status).to.be.eql(OK);
           expect(res.body).to.have.property('token');
+          done(err);
+        });
+    });
+  });
+
+  describe('Status of authentication: /auth/status', () => {
+    const { User } = app.models;
+    const validUser = {
+      email: 'user@mail.com',
+      firstName: 'Good',
+      lastName: 'User',
+      isActive: true,
+    };
+    const inactiveUser = {
+      email: 'inactive@mail.com',
+      firstName: 'Inactive',
+      lastName: 'User',
+    };
+    let validToken;
+    let inactiveToken;
+
+    before((done) => {
+      User.deleteMany({})
+        .then(() => User.create(validUser))
+        .then((user) => {
+          validToken = jwt.encode({ userId: user._id }, app.conf.security.secret);
+        })
+        .then(() => User.create(inactiveUser))
+        .then((user) => {
+          inactiveToken = jwt.encode({ userId: user._id }, app.conf.security.secret);
+        })
+        .then(() => done())
+        .catch(err => done(err));
+    });
+
+    after((done) => {
+      User.deleteMany({})
+        .then(() => done())
+        .catch(err => done(err));
+    });
+
+
+    it('Should return not authenticated user (no token send)', (done) => {
+      request.get('/auth/status')
+        .end((err, res) => {
+          expect(res.status).to.be.eql(UNAUTHORIZED);
+          done(err);
+        });
+    });
+
+    it('Should return not authenticated user (invalid token send)', (done) => {
+      request.get('/auth/status')
+        .set('Authorization', `JWT ${validToken}Invalid`)
+        .end((err, res) => {
+          expect(res.status).to.be.eql(UNAUTHORIZED);
+          done(err);
+        });
+    });
+
+    it('Should return not authenticated user (inactivated user)', (done) => {
+      request.get('/auth/status')
+        .set('Authorization', `JWT ${inactiveToken}`)
+        .end((err, res) => {
+          expect(res.status).to.be.eql(UNAUTHORIZED);
+          done(err);
+        });
+    });
+
+    it('Should return authenticated user info', (done) => {
+      request.get('/auth/status')
+        .set('Authorization', `JWT ${validToken}`)
+        .end((err, res) => {
+          expect(res.status).to.be.eql(OK);
+          expect(res.body).to.have.property('user');
           done(err);
         });
     });

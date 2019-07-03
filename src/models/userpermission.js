@@ -13,5 +13,7 @@ export default (app) => {
     },
   });
 
+  userPermissionSchema.index(['userId', 'permissionId'], { unique: true });
+
   return mongoose.model('UserPermission', userPermissionSchema);
 };

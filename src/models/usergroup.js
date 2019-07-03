@@ -2,18 +2,18 @@ import { Schema } from 'mongoose';
 
 export default (app) => {
   const { mongoose } = app.conf;
-  const groupPermissionSchema = new Schema({
-    groupId: {
+  const userGroupSchema = new Schema({
+    userId: {
       type: Schema.Types.ObjectId,
       required: true,
     },
-    permissionId: {
+    groupId: {
       type: Schema.Types.ObjectId,
       required: true,
     },
   });
 
-  groupPermissionSchema.index(['groupId', 'permissionId'], { unique: true });
+  userGroupSchema.index(['userId', 'groupId'], { unique: true });
 
-  return mongoose.model('GroupPermission', groupPermissionSchema);
+  return mongoose.model('UserGroup', userGroupSchema);
 };

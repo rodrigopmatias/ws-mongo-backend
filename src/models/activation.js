@@ -9,7 +9,10 @@ export default (app) => {
       type: Schema.Types.ObjectId,
       required: true,
     },
-    token: String,
+    token: {
+      type: String,
+      unique: true,
+    },
     usedAt: Date,
     expireAt: { type: Date },
   });

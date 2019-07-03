@@ -1,5 +1,6 @@
 /* eslint-disable import/no-dynamic-require */
 /* eslint-disable global-require */
+/* eslint-disable no-console */
 import path from 'path';
 import fs from 'fs';
 
@@ -19,5 +20,16 @@ export default (app) => {
         value: model,
         writable: false,
       });
+    });
+
+  const { Permission } = app.models;
+
+  console.log('Register models:');
+  Object.keys(app.models)
+    .forEach((name) => {
+      console.log(` » ${name}`);
+      ['GET', 'POST', 'PUT', 'DELETE'].forEach(
+        codename => Permission.register(name, codename),
+      );
     });
 };

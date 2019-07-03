@@ -51,6 +51,24 @@ export class ModelController {
     return result;
   }
 
+  async find(filters, sort, limit = 30, page = 0) {
+    let result;
+
+    try {
+      const total = await this.Model.countDocuments(filters);
+      const collection = await this.Model.find(filters)
+        .sort(sort)
+        .skip(page * limit)
+        .limit(limit);
+
+      result = defaultReponse({ collection, total, count: collection.length }, OK);
+    } catch (e) {
+      result = errorResponse(e.toString());
+    }
+
+    return result;
+  }
+
   async update(_id, data) {
     let result;
 

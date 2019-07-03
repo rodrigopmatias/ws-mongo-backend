@@ -85,7 +85,7 @@ export default (app) => {
   /**
    * User methods
    * */
-  userSchema.methods.hasPermssion = async function (name, codename) {
+  userSchema.methods.hasPermission = async function (name, codename) {
     const { Permission } = mongoose.models;
     let permIdset;
     let flag = false;
@@ -104,7 +104,7 @@ export default (app) => {
     return flag;
   };
 
-  userSchema.methods.permssionForModel = async function (name) {
+  userSchema.methods.permissionForModel = async function (name) {
     const { Permission } = mongoose.models;
     let permIdset;
     let rst = [];

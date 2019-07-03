@@ -34,9 +34,38 @@ export const authRequired = (req, res, next) => {
   if (!req.user) {
     res.status(UNAUTHORIZED).send({
       ok: false,
-      message: 'authorizations is required for access this action',
+      message: 'authorization is required for access this action',
     });
   } else {
     next();
   }
+};
+
+export const permissionRequired = (permission) => {
+  const [name, codename] = permission.split('.');
+
+  return async (req, res, next) => {
+    if (!req.user) {
+      res.status(UNAUTHORIZED).send({
+        ok: false,
+        message: 'access dained for this resouce',
+      });
+    } else {
+      const allowed = await req.user.hasPermission(name, codename);
+
+      if (!allowed) {
+        res.status(UNAUTHORIZED).send({
+          ok: false,
+          message: `user ${req.user.email} hasn't permission for this resource.`,
+        });
+      } else {
+        next();
+      }
+    }
+  };
+};
+
+export const middleware = {
+  authRequired,
+  permissionRequired,
 };

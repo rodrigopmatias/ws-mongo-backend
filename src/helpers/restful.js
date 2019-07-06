@@ -19,6 +19,38 @@ export default (app, controller) => {
       res.status(HttpStatus.OK).send(allowed.join(' '));
     });
 
+  base.route('/:_id')
+    .all(middleware.authRequired)
+    .all(middleware.permissionRequired(modelName, 'GET'))
+    .get(async (req, res) => {
+      const obj = await controller.findById(req.params._id);
+      res.status(obj.status).send(obj.result);
+    });
+
+  base.route('/:_id')
+    .all(middleware.authRequired)
+    .all(middleware.permissionRequired(modelName, 'PUT'))
+    .put(async (req, res) => {
+      const obj = await controller.update(req.params._id, req.body);
+      res.status(obj.status).send(obj.result);
+    });
+
+  base.route('/:_id')
+    .all(middleware.authRequired)
+    .all(middleware.permissionRequired(modelName, 'DELETE'))
+    .delete(async (req, res) => {
+      const obj = await controller.destroy(req.params._id);
+      res.sendStatus(obj.status);
+    });
+
+  base.route('/')
+    .all(middleware.authRequired)
+    .all(middleware.permissionRequired(modelName, 'POST'))
+    .post(async (req, res) => {
+      const obj = await controller.create(req.body);
+      res.status(obj.status).send(obj.result);
+    });
+
   base.route('/')
     .all(middleware.authRequired)
     .all(middleware.permissionRequired(modelName, 'GET'))

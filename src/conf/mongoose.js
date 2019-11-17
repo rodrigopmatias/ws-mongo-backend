@@ -5,6 +5,7 @@ const opts = {
   useNewUrlParser: true,
   useCreateIndex: true,
   useFindAndModify: false,
+  useUnifiedTopology: true,
 };
 
 if (process.env.NODE_ENV === 'test') {

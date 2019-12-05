@@ -6,7 +6,9 @@ import {
   NO_CONTENT,
 } from 'http-status-codes';
 
-export const defaultReponse = (data, status = OK, ok = true) => ({
+export const responseDispatch = (res, result) => res.status(result.status).send(result);
+
+export const defaultResponse = (data, status = OK, ok = true) => ({
   result: {
     ...data,
     ok,
@@ -14,7 +16,7 @@ export const defaultReponse = (data, status = OK, ok = true) => ({
   status,
 });
 
-export const errorResponse = (message, status = BAD_REQUEST) => defaultReponse(
+export const errorResponse = (message, status = BAD_REQUEST) => defaultResponse(
   { message },
   status,
   false,
@@ -40,7 +42,7 @@ export class ModelController {
     try {
       const res = await this.Model.findById(_id);
       if (res) {
-        result = defaultReponse({ instance: res }, OK);
+        result = defaultResponse({ instance: res }, OK);
       } else {
         result = errorResponse('not found', NOT_FOUND);
       }
@@ -61,7 +63,7 @@ export class ModelController {
         .skip(page * limit)
         .limit(limit);
 
-      result = defaultReponse({ collection, total, count: collection.length }, OK);
+      result = defaultResponse({ collection, total, count: collection.length }, OK);
     } catch (e) {
       result = errorResponse(e.toString());
     }
@@ -75,7 +77,7 @@ export class ModelController {
     try {
       const res = await this.Model.updateOne({ _id }, data);
       if (res.nModified > 0) {
-        result = defaultReponse({ updated: res.nModified }, OK);
+        result = defaultResponse({ updated: res.nModified }, OK);
       } else {
         result = errorResponse('item not found', NOT_FOUND);
       }
@@ -91,7 +93,7 @@ export class ModelController {
 
     try {
       await this.Model.deleteOne({ _id });
-      result = defaultReponse(null, NO_CONTENT);
+      result = defaultResponse(null, NO_CONTENT);
     } catch (e) {
       result = errorResponse(e.toString(), NOT_FOUND);
     }
@@ -104,7 +106,7 @@ export class ModelController {
 
     try {
       const instance = await this.Model.create(data);
-      result = defaultReponse({ instance }, CREATED);
+      result = defaultResponse({ instance }, CREATED);
     } catch (e) {
       result = errorResponse(e.toString());
     }
@@ -117,7 +119,7 @@ export class ModelController {
 
     try {
       const obj = await this.Model.findById(id);
-      result = defaultReponse(obj.toJSON(), OK);
+      result = defaultResponse(obj.toJSON(), OK);
     } catch (e) {
       result = errorResponse(e.toString());
     }

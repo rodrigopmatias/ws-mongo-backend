@@ -6,7 +6,7 @@ import {
   NOT_FOUND,
   UNAUTHORIZED,
 } from 'http-status-codes';
-import { errorResponse, defaultReponse } from '../helpers/controllers';
+import { errorResponse, defaultResponse } from '../helpers/controllers';
 
 export class AuthController {
   constructor(Model, Activation, secConf) {
@@ -39,7 +39,7 @@ export class AuthController {
         obj = errorResponse('activation token already expired', BAD_REQUEST);
       } else {
         await this.$Model.updateOne({ _id: act.userId }, { isActive: true });
-        obj = defaultReponse({}, OK);
+        obj = defaultResponse({}, OK);
       }
     }
 
@@ -78,7 +78,7 @@ export class AuthController {
 
       user = await this.Model.findOne({ _id: user._id });
 
-      res = defaultReponse({ user }, CREATED);
+      res = defaultResponse({ user }, CREATED);
     }
 
     return res;
@@ -92,7 +92,7 @@ export class AuthController {
       res = errorResponse('user not found', NOT_FOUND);
     } else if (!user.isActive) {
       await user.requestActivation();
-      res = defaultReponse({}, CREATED);
+      res = defaultResponse({}, CREATED);
     } else {
       res = errorResponse('user already activated', BAD_REQUEST);
     }
@@ -110,7 +110,7 @@ export class AuthController {
       } else if (!await user.matchPassword(password)) {
         res = errorResponse('user or password no match', UNAUTHORIZED);
       } else {
-        res = defaultReponse({
+        res = defaultResponse({
           token: jwt.encode({ userId: user._id }, this.secConf.secret),
         }, OK);
       }

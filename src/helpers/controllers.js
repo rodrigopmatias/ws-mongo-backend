@@ -6,7 +6,7 @@ import {
   NO_CONTENT,
 } from 'http-status-codes';
 
-export const responseDispatch = (res, result) => res.status(result.status).send(result);
+export const responseDispatch = (res, data) => res.status(data.status).send(data.result);
 
 export const defaultResponse = (data, status = OK, ok = true) => ({
   result: {

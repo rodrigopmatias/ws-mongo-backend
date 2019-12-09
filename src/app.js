@@ -21,8 +21,7 @@ app.use(bodyParser.json());
   models,
   controllers,
   auth,
-  routes].forEach(inject => inject(app));
-
-app.get('/debug', (req, res) => res.status(200).send({ ok: true }));
+  routes,
+].forEach(inject => inject(app));
 
 export default app;

@@ -18,6 +18,8 @@ export default (app) => {
     },
   });
 
+  permissionSchema.index(['name', 'codename'], { unique: true });
+
   permissionSchema.statics.register = async (name, codename) => {
     const { Permission } = app.models;
     const exists = await Permission.countDocuments({ name, codename }) > 0;

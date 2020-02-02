@@ -9,6 +9,10 @@ export default (app) => {
       required: true,
       index: true,
     },
+    icon: {
+      type: String,
+      required: false,
+    },
     isGroup: {
       type: Boolean,
       default: false,
